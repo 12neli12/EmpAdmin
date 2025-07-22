@@ -4,6 +4,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using prov2.Server;
 using prov2.Server.Data;
+using prov2.Server.Middlewares;
 using prov2.Server.Services;
 using System.Text;
 
@@ -40,9 +41,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
+builder.Services.AddHostedService<RabbitMqListener>();
 
 var app = builder.Build();
 
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("AllowLocalhostFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
