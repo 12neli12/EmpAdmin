@@ -247,6 +247,14 @@ const Projects = () => {
                                                                     ✅ Complete
                                                                 </button>
                                                             )}
+                                                            {(parseInt(task.assignedToId) === parseInt(user.id) || user.role === 'Administrator') && (
+                                                                <button
+                                                                    className="btn btn-sm btn-outline-primary"
+                                                                    onClick={() => startEditTask(task)}
+                                                                >
+                                                                    ✏️ Edit
+                                                                </button>
+                                                             )}
                                                     </div>
                                                 </li>
                                             );

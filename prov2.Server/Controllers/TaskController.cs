@@ -90,12 +90,20 @@ public class TaskController : ControllerBase
         return NoContent();
     }
 
-    [Authorize(Roles = "Administrator")]
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateTask(int id, [FromBody] UpdateTaskRequest req)
     {
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var task = await _db.Tasks.FindAsync(id);
         if (task == null) return NotFound();
+
+        // Allow if Administrator OR assigned user
+        var isAdmin = User.IsInRole("Administrator");
+        var isAssignedUser = task.AssignedToId == userId;
+
+        if (!isAdmin && !isAssignedUser)
+            return Forbid();
 
         task.Title = req.Title;
         task.Description = req.Description;
@@ -104,5 +112,6 @@ public class TaskController : ControllerBase
         await _db.SaveChangesAsync();
         return Ok(task);
     }
+
 
 }
