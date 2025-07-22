@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("prov2.Server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8fddf17f94cf8ef73318077e5804134faaded622")]
 [assembly: System.Reflection.AssemblyProductAttribute("prov2.Server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("prov2.Server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

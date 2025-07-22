@@ -197,88 +197,94 @@ const Projects = () => {
                 </div>
             )}
 
-            <h4>Your Projects</h4>
-            {projects.length === 0 ? (
-                <p>No projects assigned yet.</p>
-            ) : (
-                <div className="accordion" id="projectsAccordion">
-                    {projects.map(project => (
-                        <div key={project.id} className="accordion-item mb-2">
-                            <h2 className="accordion-header" id={`heading-${project.id}`}>
-                                <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target={`#collapse-${project.id}`} aria-expanded="false">
-                                    <strong>{project.name}</strong> <small className="text-muted ms-2">({project.description})</small>
-                                </button>
-                            </h2>
-                            <div id={`collapse-${project.id}`} className="accordion-collapse collapse" data-bs-parent="#projectsAccordion">
-                                <div className="accordion-body">
-                                    {user.role === 'Administrator' && (
-                                        <>
-                                            <button className="btn btn-sm btn-danger mb-2" onClick={() => deleteProject(project.id)}>Delete Project</button>
-                                            <button className="btn btn-sm btn-warning mb-2 ms-2" onClick={() => startEditProject(project)}>Edit Project</button>
-                                        </>
-                                    )}
+            { projects.map(project => {
+                const isEmployeeAssignedToProject = project.assignedEmployees?.some(emp => emp.id === user.id);
 
-                                    <ul className="list-group mb-3">
-                                        {project.tasks?.length > 0 ? (
-                                            project.tasks.map(task => (
+                return (
+                    <div key={project.id} className="accordion-item mb-2">
+                        <h2 className="accordion-header" id={`heading-${project.id}`}>
+                            <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target={`#collapse-${project.id}`} aria-expanded="false">
+                                <strong>{project.name}</strong> <small className="text-muted ms-2">({project.description})</small>
+                            </button>
+                        </h2>
+                        <div id={`collapse-${project.id}`} className="accordion-collapse collapse" data-bs-parent="#projectsAccordion">
+                            <div className="accordion-body">
+                                {user.role === 'Administrator' && (
+                                    <>
+                                        <button className="btn btn-sm btn-danger mb-2" onClick={() => deleteProject(project.id)}>Delete Project</button>
+                                        <button className="btn btn-sm btn-warning mb-2 ms-2" onClick={() => startEditProject(project)}>Edit Project</button>
+                                    </>
+                                )}
+
+                                <ul className="list-group mb-3">
+                                    {project.tasks?.length > 0 ? (
+                                        project.tasks.map(task => {
+                                            console.log('Task:', task);
+                                            console.log('User ID:', user.id, 'Assigned To:', task.assignedToId);
+                                            console.log('Condition:',
+                                                !task.isCompleted,
+                                                parseInt(task.assignedToId) === parseInt(user.id),
+                                                user.role === 'Administrator'
+                                            );
+
+                                            return (
                                                 <li key={task.id} className="list-group-item d-flex justify-content-between align-items-center">
                                                     <div>
                                                         <strong>{task.title}</strong>
                                                         {task.isCompleted && <span className="badge bg-success ms-2">Completed</span>}
-                                                        {task.assignedToId !== user.id && user.role !== 'Administrator' && (
-                                                            <span className="text-muted small ms-2">🔒 Read-only</span>
-                                                        )}
                                                         <br />
-                                                        <span className="badge bg-secondary mt-1">Assigned to: {getEmployeeName(task.assignedToId)}</span>
+                                                        <span className="badge bg-secondary mt-1">
+                                                            Assigned to: {getEmployeeName(task.assignedToId)}
+                                                        </span>
                                                     </div>
                                                     <div className="d-flex gap-2">
-                                                        {!task.isCompleted && (task.assignedToId === user.id || user.role === 'Administrator') && (
-                                                            <button className="btn btn-sm btn-outline-success" onClick={() => markTaskCompleted(task.id)}>
-                                                                ✅ Complete
-                                                            </button>
-                                                        )}
-                                                        {(user.role === 'Administrator' || task.assignedToId === user.id) && (
-                                                            <>
-                                                                <button className="btn btn-sm btn-warning" onClick={() => startEditTask(task)}>✏️</button>
-                                                                <button className="btn btn-sm btn-danger" onClick={() => deleteTask(task.id)}>🗑️</button>
-                                                            </>
-                                                        )}
+                                                        {!task.isCompleted &&
+                                                            (parseInt(task.assignedToId) === parseInt(user.id) || user.role === 'Administrator') && (
+                                                                <button
+                                                                    className="btn btn-sm btn-outline-success"
+                                                                    onClick={() => markTaskCompleted(task.id)}
+                                                                >
+                                                                    ✅ Complete
+                                                                </button>
+                                                            )}
                                                     </div>
                                                 </li>
-                                            ))
-                                        ) : (
-                                            <li className="list-group-item text-muted">No tasks yet</li>
-                                        )}
-                                    </ul>
-
-                                    {(user.role === 'Administrator' || isPartOfProject(project)) && (
-                                        <div className="border p-3 rounded bg-light">
-                                            <input
-                                                className="form-control mb-2"
-                                                type="text"
-                                                placeholder="New task name"
-                                                value={newTaskTitles[project.id] || ''}
-                                                onChange={(e) => setNewTaskTitles(prev => ({ ...prev, [project.id]: e.target.value }))}
-                                            />
-                                            <select
-                                                className="form-select mb-2"
-                                                value={newTaskAssignees[project.id] || ''}
-                                                onChange={(e) => setNewTaskAssignees(prev => ({ ...prev, [project.id]: e.target.value }))}
-                                            >
-                                                <option value="">Select assignee</option>
-                                                {project.assignedEmployees?.map(e => (
-                                                    <option key={e.id} value={e.id}>{e.fullName}</option>
-                                                ))}
-                                            </select>
-                                            <button className="btn btn-success btn-sm" onClick={() => createTask(project.id)}>Add Task</button>
-                                        </div>
+                                            );
+                                        })
+                                    ) : (
+                                        <li className="list-group-item text-muted">No tasks yet</li>
                                     )}
-                                </div>
+
+                                </ul>
+
+                               
+                                    <div className="border p-3 rounded bg-light">
+                                        <input
+                                            className="form-control mb-2"
+                                            type="text"
+                                            placeholder="New task name"
+                                            value={newTaskTitles[project.id] || ''}
+                                            onChange={(e) => setNewTaskTitles(prev => ({ ...prev, [project.id]: e.target.value }))}
+                                        />
+                                        <select
+                                            className="form-select mb-2"
+                                            value={newTaskAssignees[project.id] || ''}
+                                            onChange={(e) => setNewTaskAssignees(prev => ({ ...prev, [project.id]: e.target.value }))}
+                                        >
+                                            <option value="">Select assignee</option>
+                                            {project.assignedEmployees?.map(e => (
+                                                <option key={e.id} value={e.id}>{e.fullName}</option>
+                                            ))}
+                                        </select>
+                                        <button className="btn btn-success btn-sm" onClick={() => createTask(project.id)}>Add Task</button>
+                                    </div>
+                                
                             </div>
                         </div>
-                    ))}
-                </div>
-            )}
+                    </div>
+                );
+            })}
+
 
             {editingTask && (
                 <div className="card p-3 my-3 shadow-sm">

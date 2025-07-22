@@ -70,12 +70,14 @@ public class AutheController : ControllerBase
 
         return Ok(new
         {
+            user.Id,
             user.Username,
             user.FullName,
             user.Role,
             ProfilePictureUrl = profileUrl
         });
     }
+
 
     [Authorize(Roles = "Administrator")]
     [HttpPut("employees/{id}")]
