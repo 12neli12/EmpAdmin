@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using prov2.Server.Data;
 
@@ -10,9 +11,11 @@ using prov2.Server.Data;
 namespace prov2.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250723084100_AddIsDeletedToUsers")]
+    partial class AddIsDeletedToUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,7 +24,7 @@ namespace prov2.Server.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Project", b =>
+            modelBuilder.Entity("prov2.Server.Entities.Project", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -31,9 +34,6 @@ namespace prov2.Server.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -144,9 +144,11 @@ namespace prov2.Server.Migrations
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Project", "Project")
+                    b.HasOne("prov2.Server.Entities.Project", "Project")
                         .WithMany("Tasks")
-                        .HasForeignKey("ProjectId");
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("AssignedTo");
 
@@ -157,9 +159,11 @@ namespace prov2.Server.Migrations
 
             modelBuilder.Entity("prov2.Server.Entities.UserProject", b =>
                 {
-                    b.HasOne("Project", "Project")
+                    b.HasOne("prov2.Server.Entities.Project", "Project")
                         .WithMany("UserProjects")
-                        .HasForeignKey("ProjectId");
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("prov2.Server.Entities.User", "User")
                         .WithMany("UserProjects")
@@ -170,7 +174,7 @@ namespace prov2.Server.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Project", b =>
+            modelBuilder.Entity("prov2.Server.Entities.Project", b =>
                 {
                     b.Navigation("Tasks");
 

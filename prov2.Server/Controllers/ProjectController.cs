@@ -89,6 +89,7 @@ public class ProjectController : ControllerBase
     {
         var project = await _db.Projects
             .Include(p => p.Tasks)
+            .IgnoreQueryFilters() 
             .FirstOrDefaultAsync(p => p.Id == id);
 
         if (project == null)
@@ -97,10 +98,12 @@ public class ProjectController : ControllerBase
         if (project.Tasks.Any(t => !t.IsCompleted))
             return BadRequest("Cannot delete a project with open tasks");
 
-        _db.Projects.Remove(project);
+        project.IsDeleted = true;
         await _db.SaveChangesAsync();
+
         return NoContent();
     }
+
 
     [Authorize(Roles = "Administrator")]
     [HttpPut("{id}")]

@@ -152,7 +152,7 @@ public class AutheController : ControllerBase
     [HttpDelete("employees/{id}")]
     public async Task<IActionResult> DeleteUser(int id)
     {
-        var user = await _db.Users.FindAsync(id);
+        var user = await _db.Users.IgnoreQueryFilters().FirstOrDefaultAsync(u => u.Id == id);
         if (user == null)
             return NotFound("User not found");
 
@@ -160,12 +160,11 @@ public class AutheController : ControllerBase
         if (isAssigned)
             return BadRequest("This user is assigned to one or more tasks and cannot be deleted.");
 
-        _db.Users.Remove(user);
+        user.IsDeleted = true;
         await _db.SaveChangesAsync();
 
-        return Ok(new { message = "User deleted successfully" });
+        return Ok(new { message = "User soft-deleted successfully" });
     }
-
 
 
 

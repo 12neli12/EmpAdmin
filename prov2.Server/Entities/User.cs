@@ -9,6 +9,9 @@ public class User
     public string FullName { get; set; } = string.Empty;
     public string? ProfilePictureUrl { get; set; }
 
+    // Soft delete flag
+    public bool IsDeleted { get; set; } = false;
+
     public ICollection<UserProject> UserProjects { get; set; } = new List<UserProject>();
     public ICollection<ProjectTask> AssignedTasks { get; set; } = new List<ProjectTask>();
     public ICollection<ProjectTask> CreatedTasks { get; set; } = new List<ProjectTask>();
